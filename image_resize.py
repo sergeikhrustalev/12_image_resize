@@ -79,6 +79,25 @@ class SizeCalculator:
             self.height = height
 
 
+def calculate_new_size(storage, current_size):
+
+    calc = SizeCalculator(current_size)
+
+    if storage.has_scale:
+        calc.calculate(scale=storage.scale)
+
+    elif not storage.has_width:
+        calc.calculate(height=storage.height)
+
+    elif not storage.has_height:
+        calc.calculate(width=storage.width)
+
+    else:
+        calc.calculate(width=storage.width, height=storage.height)
+
+    return calc
+
+
 if __name__ == '__main__':
 
     storage = ArgumentStorage()
@@ -100,22 +119,10 @@ if __name__ == '__main__':
         sys.exit()
 
     image = Image.open(storage.image)
-    calculator = SizeCalculator(image.size)
+    calculator = calculate_new_size(storage, image.size)
 
-    if storage.has_scale:
-        calculator.calculate(scale=storage.scale)
-
-    elif not storage.has_width:
-        calculator.calculate(height=storage.height)
-
-    elif not storage.has_height:
-        calculator.calculate(width=storage.width)
-
-    else:
-        calculator.calculate(width=storage.width, height=storage.height)
-
-        if calculator.proportion_changed:
-            print('WARNING: Image proportion has changed')
+    if calculator.proportion_changed:
+        print('WARNING: Image proportion has changed')
 
     result_image = image.resize(calculator.size)
 
