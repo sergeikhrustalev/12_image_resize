@@ -1,5 +1,6 @@
 import sys
 import argparse
+import os.path
 
 from PIL import Image
 
@@ -7,20 +8,16 @@ from PIL import Image
 class ArgumentStorage:
 
     def __init__(self):
+
         parser = argparse.ArgumentParser(description='image resizer')
-
-        parser.add_argument(
-            'source_image',
-            help='path to source image',
-            type=str
-        )
-
+        parser.add_argument('image', help='source image path')
         parser.add_argument('--width', help='result image width', type=int)
         parser.add_argument('--height', help='result image height', type=int)
         parser.add_argument('--scale', help='result image scale', type=float)
-        parser.add_argument('--output', help='path to result image', type=str)
+        parser.add_argument('--output', help='result image path')
         arguments = parser.parse_args()
-        self.source_image = arguments.source_image
+
+        self.image = arguments.image
         self.width = arguments.width
         self.height = arguments.height
         self.scale = arguments.scale
@@ -84,37 +81,54 @@ class SizeCalculator:
 
 if __name__ == '__main__':
 
-    arguments = ArgumentStorage()
+    storage = ArgumentStorage()
 
-    if not arguments.has_width and not arguments.has_height and not arguments.has_scale:
-        sys.exit('Image will not be resized, because no one resize option is sets')
+    if all((
+        not storage.has_width,
+        not storage.has_height,
+        not storage.has_scale
+    )):
 
-    if (arguments.has_width or arguments.has_height) and arguments.has_scale:
-        sys.exit('Options conflict: width or height are not compatible with scale')
+        print(
+            'Image will not be resized,',
+            'because no one resize option is sets'
+        )
 
-    image = Image.open(arguments.source_image)
-    size_calculator = SizeCalculator(image.size)
+        sys.exit()
 
-    if arguments.has_scale:
-        size_calculator.calculate(scale=arguments.scale)
+    if (storage.has_width or storage.has_height) and storage.has_scale:
 
-    elif not arguments.has_width:
-        size_calculator.calculate(height=arguments.height)
+        print(
+            'Options conflict:',
+            '--width or --height are not compatible with --scale'
+        )
 
-    elif not arguments.has_height:
-        size_calculator.calculate(width=arguments.width)
+        sys.exit()
+
+    image = Image.open(storage.image)
+    calculator = SizeCalculator(image.size)
+
+    if storage.has_scale:
+        calculator.calculate(scale=storage.scale)
+
+    elif not storage.has_width:
+        calculator.calculate(height=storage.height)
+
+    elif not storage.has_height:
+        calculator.calculate(width=storage.width)
 
     else:
-        size_calculator.calculate(width=arguments.width, height=arguments.height)
+        calculator.calculate(width=storage.width, height=storage.height)
 
-        if size_calculator.proportion_changed:
+        if calculator.proportion_changed:
             print('WARNING: Image proportion changes')
 
-    result_image = image.resize(size_calculator.size)
+    result_image = image.resize(calculator.size)
 
-    if arguments.has_output:
-        result_image.save(arguments.output)
+    if storage.has_output:
+        result_image.save(storage.output)
 
     else:
-        image_filename = 'xxx.jpg'
+        filename, file_ext = os.path.splitext(storage.image)
+        image_filename = '{}__{}{}'.format(filename, calculator, file_ext)
         result_image.save(image_filename)
