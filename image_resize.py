@@ -74,7 +74,7 @@ class SizeCalculator:
                 return
 
             proportion = width / height
-            self.proportion_changed = not proportion == self.proportion
+            self.proportion_changed = proportion != self.proportion
             self.width = width
             self.height = height
 
@@ -89,20 +89,14 @@ if __name__ == '__main__':
         not storage.has_scale
     )):
 
-        print(
-            'Image will not be resized,',
-            'because no one resize option is sets'
-        )
-
+        print('No one resize option has set')
+        print('Run script with [--width, --height | --scale] options')
         sys.exit()
 
     if (storage.has_width or storage.has_height) and storage.has_scale:
 
-        print(
-            'Options conflict:',
-            '--width or --height are not compatible with --scale'
-        )
-
+        print('Options conflict:')
+        print('\t--width or --height are not compatible with --scale')
         sys.exit()
 
     image = Image.open(storage.image)
@@ -121,7 +115,7 @@ if __name__ == '__main__':
         calculator.calculate(width=storage.width, height=storage.height)
 
         if calculator.proportion_changed:
-            print('WARNING: Image proportion changes')
+            print('WARNING: Image proportion has changed')
 
     result_image = image.resize(calculator.size)
 
