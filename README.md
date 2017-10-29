@@ -27,7 +27,7 @@ optional arguments:
 
 # Requirements
 
-python 3.5+
+python 3.5+  
 See requirements.txt for dependence
 
 # Using examples
