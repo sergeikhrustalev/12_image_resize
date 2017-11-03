@@ -93,8 +93,8 @@ if __name__ == '__main__':
 
     if {'output'} < set(arguments):
         result_image.save(arguments['output'])
+        sys.exit()
 
-    else:
-        filename, file_ext = os.path.splitext(arguments['image'])
-        image_filename = '{}__{}{}'.format(filename, calculator, file_ext)
-        result_image.save(image_filename)
+    filename, file_ext = os.path.splitext(arguments['image'])
+    image_filename = '{}__{}{}'.format(filename, calculator, file_ext)
+    result_image.save(image_filename)
