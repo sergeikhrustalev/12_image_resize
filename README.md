@@ -15,7 +15,7 @@ usage: image_resize.py [-h] [--width WIDTH] [--height HEIGHT] [--scale SCALE]
 image resizer
 
 positional arguments:
-  image            source image path
+  imagepath            source image path
 
 optional arguments:
   -h, --help       show this help message and exit
