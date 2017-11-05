@@ -85,12 +85,12 @@ if __name__ == '__main__':
     parser.add_argument('--output', help='result image path')
     args = parser.parse_args()
 
-    if not args.scale and not args.width and not args.height:
+    if not any((args.scale, args.width, args.height)):
         print('No one resize option has set')
         print('Run script with [--width, --height | --scale] options')
         sys.exit()
 
-    if args.scale and args.width or args.scale and args.height:
+    if args.scale and (args.width or args.height):
         print('Options conflict:')
         print('\t--width or --height are not compatible with --scale')
         sys.exit()
